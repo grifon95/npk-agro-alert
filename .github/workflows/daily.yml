@@ -3,6 +3,7 @@ name: NPK Agro Daily Alert
 on:
   schedule:
     - cron: "0 7 * * *"
+    - cron: "0 15 * * *"
 
   workflow_dispatch:
 
