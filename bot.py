@@ -2,6 +2,7 @@ import os
 import json
 import requests
 import re
+import asyncio
 
 from bs4 import BeautifulSoup
 from telegram import Bot
@@ -134,7 +135,7 @@ Promena: {promena(stara, nova)}
         poruka += "\n➡️ Danas nema promena cena."
 
 
-    import asyncio
+
 
 
 async def posalji_telegram():
