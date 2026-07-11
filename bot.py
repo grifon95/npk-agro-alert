@@ -63,24 +63,42 @@ def uzmi_cene():
         "jecam": broj(jecam.group(1)) if jecam else None,
         "kukuruz": broj(kukuruz.group(1)) if kukuruz else None
     }
+
+
+
 def promena(stara, nova):
 
     if stara is None or nova is None:
         return "Nema dovoljno podataka"
 
+
     razlika = nova - stara
 
     procenat = (razlika / stara) * 100
 
+
     znak = "📈" if razlika > 0 else "📉"
 
+
     return f"{znak} {razlika:+.2f} din ({procenat:+.2f}%)"
+
+
+
+async def posalji_telegram(poruka):
+
+    bot = Bot(token=TOKEN)
+
+    await bot.send_message(
+        chat_id=CHAT_ID,
+        text=poruka
+    )
 
 
 
 def main():
 
     nove_cene = uzmi_cene()
+
 
     print("Nove cene:")
     print(nove_cene)
@@ -108,11 +126,11 @@ def main():
 
     for proizvod, nova in nove_cene.items():
 
-        stara = stare_cene.get(proizvod)
-
-
         if nova is None:
             continue
+
+
+        stara = stare_cene.get(proizvod)
 
 
         poruka += f"""
@@ -136,33 +154,23 @@ Promena: {promena(stara, nova)}
 
 
 
-
-
-    import asyncio
-
-    async def posalji_telegram():
-
-        bot = Bot(token=TOKEN)
-
-        await bot.send_message(
-            chat_id=CHAT_ID,
-            text=poruka
-        )
-
-
-    asyncio.run(posalji_telegram())
-
-
-with open("poslednje_cene.json", "w") as f:
-
-    json.dump(
-        nove_cene,
-        f,
-        indent=4
+    asyncio.run(
+        posalji_telegram(poruka)
     )
 
 
-print("✅ Telegram poruka poslata")
+
+    with open("poslednje_cene.json", "w") as f:
+
+        json.dump(
+            nove_cene,
+            f,
+            indent=4
+        )
+
+
+    print("✅ Telegram poruka poslata")
+
 
 
 if __name__ == "__main__":
