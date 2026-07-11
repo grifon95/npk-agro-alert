@@ -134,26 +134,32 @@ Promena: {promena(stara, nova)}
         poruka += "\n➡️ Danas nema promena cena."
 
 
+    import asyncio
+
+
+async def posalji_telegram():
+
     bot = Bot(token=TOKEN)
 
-
-    bot.send_message(
+    await bot.send_message(
         chat_id=CHAT_ID,
         text=poruka
     )
 
 
-    with open("poslednje_cene.json", "w") as f:
-
-        json.dump(
-            nove_cene,
-            f,
-            indent=4
-        )
+asyncio.run(posalji_telegram())
 
 
-    print("✅ Telegram poruka poslata")
+with open("poslednje_cene.json", "w") as f:
 
+    json.dump(
+        nove_cene,
+        f,
+        indent=4
+    )
+
+
+print("✅ Telegram poruka poslata")
 
 
 if __name__ == "__main__":
