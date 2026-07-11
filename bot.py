@@ -4,6 +4,7 @@ import requests
 import re
 import asyncio
 
+from datetime import datetime
 from bs4 import BeautifulSoup
 from telegram import Bot
 
@@ -17,6 +18,7 @@ url = "https://nscomex.com/podaci-iz-trgovanja/nedeljni-izvestaj/"
 
 def broj(x):
     return float(x.replace(",", "."))
+
 
 
 def uzmi_cene():
@@ -58,10 +60,15 @@ def uzmi_cene():
 
 
     return {
+
         "psenica": broj(psenica.group(1)) if psenica else None,
+
         "soja": broj(soja.group(1)) if soja else None,
+
         "jecam": broj(jecam.group(1)) if jecam else None,
+
         "kukuruz": broj(kukuruz.group(1)) if kukuruz else None
+
     }
 
 
@@ -74,13 +81,22 @@ def promena(stara, nova):
 
     razlika = nova - stara
 
+
+    if razlika == 0:
+        return "➡️ Nema promene"
+
+
     procenat = (razlika / stara) * 100
 
 
-    znak = "📈" if razlika > 0 else "📉"
+    if razlika > 0:
+        znak = "📈"
+    else:
+        znak = "📉"
 
 
     return f"{znak} {razlika:+.2f} din ({procenat:+.2f}%)"
+
 
 
 
@@ -95,6 +111,7 @@ async def posalji_telegram(poruka):
 
 
 
+
 def main():
 
     nove_cene = uzmi_cene()
@@ -104,10 +121,13 @@ def main():
     print(nove_cene)
 
 
+
     try:
 
         with open("poslednje_cene.json", "r") as f:
+
             stare_cene = json.load(f)
+
 
     except:
 
@@ -115,16 +135,35 @@ def main():
 
 
 
-    poruka = """
+    datum = datetime.now().strftime("%d.%m.%Y")
+
+
+
+    nazivi = {
+
+        "psenica": "🌾 Pšenica",
+
+        "soja": "🌱 Soja",
+
+        "jecam": "🌿 Ječam",
+
+        "kukuruz": "🌽 Kukuruz"
+
+    }
+
+
+
+    poruka = f"""
 🌾 NPK AGRO DAILY ALERT
+
+📅 Datum: {datum}
 
 """
 
 
-    promena_postoji = False
-
 
     for proizvod, nova in nove_cene.items():
+
 
         if nova is None:
             continue
@@ -133,24 +172,20 @@ def main():
         stara = stare_cene.get(proizvod)
 
 
-        poruka += f"""
-➡️ {proizvod.upper()}
 
-Stara: {stara:.2f} din/kg
-Nova: {nova:.2f} din/kg
+        poruka += f"""
+
+{nazivi.get(proizvod, proizvod.upper())}
+
+
+Stara cena: {stara:.2f} din/kg
+
+Nova cena: {nova:.2f} din/kg
+
 Promena: {promena(stara, nova)}
 
+
 """
-
-
-        if stara != nova:
-            promena_postoji = True
-
-
-
-    if not promena_postoji:
-
-        poruka += "\n➡️ Danas nema promena cena."
 
 
 
@@ -169,7 +204,10 @@ Promena: {promena(stara, nova)}
         )
 
 
+
     print("✅ Telegram poruka poslata")
+
+
 
 
 
