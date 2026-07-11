@@ -138,17 +138,19 @@ Promena: {promena(stara, nova)}
 
 
 
-async def posalji_telegram():
+    import asyncio
 
-    bot = Bot(token=TOKEN)
+    async def posalji_telegram():
 
-    await bot.send_message(
-        chat_id=CHAT_ID,
-        text=poruka
-    )
+        bot = Bot(token=TOKEN)
+
+        await bot.send_message(
+            chat_id=CHAT_ID,
+            text=poruka
+        )
 
 
-asyncio.run(posalji_telegram())
+    asyncio.run(posalji_telegram())
 
 
 with open("poslednje_cene.json", "w") as f:
