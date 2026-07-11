@@ -14,6 +14,10 @@ jobs:
     runs-on: ubuntu-latest
 
 
+    permissions:
+      contents: write
+
+
     steps:
 
       - name: Checkout repository
@@ -38,3 +42,12 @@ jobs:
 
         run: |
           python bot.py
+
+
+      - name: Save new prices
+        run: |
+          git config --global user.name "npk-agro-bot"
+          git config --global user.email "bot@github.com"
+          git add poslednje_cene.json
+          git commit -m "Update prices" || exit 0
+          git push
